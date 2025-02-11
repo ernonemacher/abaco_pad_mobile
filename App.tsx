@@ -1,251 +1,366 @@
-import React, { useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import './global.css';
+
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import WelcomePage from './components/WelcomePage';
+import RegisterPage from './components/RegisterPage';
+import AdminSetupPage from './components/AdminSetupPage';
+import BookshelfPage from './components/BookShelfPage';
+import BookFormPage from './components/BookFormPage';
+import EditBookPage from './components/EditBookPage';
+import BookNotesPage from './components/BookNotesPage';
+import NoteFormPage from './components/NoteFormPage';
+import NoteSettingsPage from './components/NoteSettingsPage';
+
+export type ViewType =
+    | 'welcome'
+    | 'admin-setup'
+    | 'bookshelf'
+    | 'new-book'
+    | 'edit-book'
+    | 'book-notes'
+    | 'new-note'
+    | 'edit-note'
+    | 'note-settings';
+
+export interface Book {
+    id: number;
+    title: string;
+    isFavorite: boolean;
+}
+
+export interface Note {
+    id: number;
+    bookId: number;
+    title: string;
+    content: string;
+    fontSize: number;
+    font: string;
+    color: string;
+}
 
 const Stack = createNativeStackNavigator();
 
-const CustomButton = ({ label, onPress, style }) => (
-  <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
-    <Text style={styles.label}>{label}</Text>
-  </TouchableOpacity>
-);
+function App() {
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [anyoneCanEdit, setAnyoneCanEdit] = useState(false);
+    const [email, setEmail] = useState('');
 
-const TelaInicial = ({ navigation }) => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Welcome to AbacoPad!</Text>
-    <Text style={styles.subtitle}>
-      Get started by creating or logging into your pad
-    </Text>
-    <TextInput
-      style={styles.input}
-      placeholder="abaco.vercel.app"
-      placeholderTextColor="#888"
-    />
-    <CustomButton
-      label="ABACO"
-      onPress={() => navigation.navigate("Password")}
-      style={styles.button}
-    />
-  </View>
-);
+    const [books, setBooks] = useState<Book[]>([
+        { id: 1, title: 'BOOK 1', isFavorite: false },
+        { id: 2, title: 'BOOK 2', isFavorite: false },
+        { id: 3, title: 'BOOK 3', isFavorite: false },
+    ]);
+    const [newBookTitle, setNewBookTitle] = useState('');
+    const [bookText, setBookText] = useState('');
 
-const TelaLogin = ({ navigation }) => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Enter the bookshelf password</Text>
-    <TextInput
-      style={styles.input}
-      placeholder="Password"
-      placeholderTextColor="#888"
-      secureTextEntry
-    />
-    <CustomButton
-      label="Enter"
-      onPress={() => navigation.navigate("Bookshelf")}
-      style={styles.button}
-    />
-  </View>
-);
+    const [notes, setNotes] = useState<Note[]>([]);
+    const [editingNote, setEditingNote] = useState<Note | null>(null);
+    const [noteTitle, setNoteTitle] = useState('');
+    const [noteContent, setNoteContent] = useState('');
+    const [fontSize, setFontSize] = useState(16);
+    const [font, setFont] = useState('Arial');
+    const [color, setColor] = useState('#000000');
 
-const TelaBiblioteca = ({ navigation }) => {
-  const books = ["Book 1", "Book 2", "Book 3"];
+    const handleCreateNote = (bookId: number) => {
+        if (noteTitle.trim()) {
+            const newNote: Note = {
+                id: notes.length + 1,
+                bookId,
+                title: noteTitle.trim(),
+                content: noteContent,
+                fontSize,
+                font,
+                color,
+            };
+            setNotes([...notes, newNote]);
+            setNoteTitle('');
+            setNoteContent('');
+            setFontSize(16);
+            setFont('Arial');
+            setColor('#000000');
+        }
+    };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to your bookshelf!</Text>
-      <FlatList
-        data={books}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.bookItem}
-            onPress={() => navigation.navigate("BookNotes", { book: item })}
-          >
-            <Text style={styles.bookText}>{item}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      <CustomButton label="New Book" onPress={() => {}} style={styles.button} />
-    </View>
-  );
-};
+    const handleUpdateNote = () => {
+        if (editingNote && noteTitle.trim()) {
+            setNotes(
+                notes.map((note) =>
+                    note.id === editingNote.id
+                        ? { ...note, title: noteTitle.trim(), content: noteContent, fontSize, font, color }
+                        : note
+                )
+            );
+            setEditingNote(null);
+            setNoteTitle('');
+            setNoteContent('');
+            setFontSize(16);
+            setFont('Arial');
+            setColor('#000000');
+        }
+    };
 
-const TelaLivros = ({ navigation, route }) => {
-  const { book } = route.params;
-  const notes = ["Note 1", "Note 2", "Note 3"];
+    const handleUpdateBook = (bookId: number, newTitle: string) => {
+        setBooks(
+            books.map((book) =>
+                book.id === bookId ? { ...book, title: newTitle } : book
+            )
+        );
+    };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{book}</Text>
-      <FlatList
-        data={notes}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.bookItem}
-            onPress={() => navigation.navigate("Note", { note: item })}
-          >
-            <Text style={styles.bookText}>{item}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      <CustomButton label="New Note" onPress={() => {}} style={styles.button} />
-    </View>
-  );
-};
+    const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+        <View className="min-h-screen bg-[#232324] flex items-center justify-center p-6">
+            <View className="w-full max-w-[452px] min-h-[801px] bg-[#232324] border border-black/10 shadow-2xl rounded-[10px] p-6 flex flex-col items-center justify-center">
+                {children}
+            </View>
+        </View>
+    );
 
-const TelaNotas = ({ navigation, route }) => {
-  const { note } = route.params;
-  const [text, setText] = useState(
-    "Class aptent taciti sociosquad litora torquent per conubia nostra, per inceptos himenaeos."
-  );
+    return (
+        <NavigationContainer>
+            <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Welcome">
+                    {({ navigation }) => (
+                        <Layout>
+                            <WelcomePage
+                                email={email}
+                                onChangeEmail={setEmail}
+                                password={password}
+                                onChangePassword={setPassword}
+                                showPassword={showPassword}
+                                onToggleShowPassword={() => setShowPassword(!showPassword)}
+                                onStart={() => navigation.navigate('Bookshelf')}
+                                onRegister={() => navigation.navigate('Register')}
+                            />
+                        </Layout>
+                    )}
+                </Stack.Screen>
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{note}</Text>
-      <TextInput
-        style={[styles.input, styles.noteInput]}
-        multiline
-        value={text}
-        onChangeText={setText}
-      />
-      <CustomButton
-        label="Style"
-        onPress={() => navigation.navigate("NoteStyle")}
-        style={styles.button}
-      />
-    </View>
-  );
-};
+                <Stack.Screen name="Register">
+                    {({ navigation }) => (
+                        <Layout>
+                            <RegisterPage
+                                email={email}
+                                onChangeEmail={setEmail}
+                                password={password}
+                                onChangePassword={setPassword}
+                                showPassword={showPassword}
+                                onToggleShowPassword={() => setShowPassword(!showPassword)}
+                                onCreate={() => navigation.navigate('Bookshelf')}
+                            />
+                        </Layout>
+                    )}
+                </Stack.Screen>
 
-const NoteStyleScreen = () => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Note Style</Text>
-    <View style={styles.option}>
-      <Text style={styles.optionText}>Font</Text>
-      <Text style={styles.optionValue}>Arial</Text>
-    </View>
-    <View style={styles.option}>
-      <Text style={styles.optionText}>Font-Size</Text>
-      <Text style={styles.optionValue}>14 px</Text>
-    </View>
-    <View style={styles.option}>
-      <Text style={styles.optionText}>Special Configs</Text>
-      <Text style={styles.optionValue}>...</Text>
-    </View>
-  </View>
-);
+                <Stack.Screen name="AdminSetup">
+                    {({ navigation }) => (
+                        <Layout>
+                            <AdminSetupPage
+                                password={password}
+                                setPassword={setPassword}
+                                showPassword={showPassword}
+                                toggleShowPassword={() => setShowPassword(!showPassword)}
+                                anyoneCanEdit={anyoneCanEdit}
+                                setAnyoneCanEdit={setAnyoneCanEdit}
+                                onContinue={() => navigation.navigate('Bookshelf')}
+                            />
+                        </Layout>
+                    )}
+                </Stack.Screen>
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Welcome">
-        <Stack.Screen
-          name="Welcome"
-          component={TelaInicial}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Password"
-          component={TelaLogin}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Bookshelf"
-          component={TelaBiblioteca}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="BookNotes"
-          component={TelaLivros}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Note"
-          component={TelaNotas}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="NoteStyle"
-          component={NoteStyleScreen}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+                <Stack.Screen name="Bookshelf">
+                    {({ navigation }) => (
+                        <Layout>
+                            <BookshelfPage
+                                books={books}
+                                onSelectBook={(book) =>
+                                    navigation.navigate('BookNotes', { bookId: book.id, bookTitle: book.title })
+                                }
+                                onToggleFavorite={(id) =>
+                                    setBooks(
+                                        books.map((book) =>
+                                            book.id === id ? { ...book, isFavorite: !book.isFavorite } : book
+                                        )
+                                    )
+                                }
+                                onEditBook={(book) =>
+                                    navigation.navigate('EditBook', { bookId: book.id, bookTitle: book.title })
+                                }
+                                onDeleteBook={(id) => setBooks(books.filter((book) => book.id !== id))}
+                                onNewBook={() => navigation.navigate('NewBook')}
+                                onBack={() => navigation.navigate('Welcome')}
+                            />
+                        </Layout>
+                    )}
+                </Stack.Screen>
+
+                <Stack.Screen name="NewBook">
+                    {({ navigation }) => (
+                        <Layout>
+                            <BookFormPage
+                                setBookText={setBookText}
+                                bookText={bookText}
+                                isEditing={false}
+                                bookTitle={newBookTitle}
+                                setBookTitle={setNewBookTitle}
+                                onSave={() => {
+                                    if (newBookTitle.trim()) {
+                                        const newBook: Book = {
+                                            id: books.length + 1,
+                                            title: newBookTitle.trim(),
+                                            isFavorite: false,
+                                        };
+                                        setBooks([...books, newBook]);
+                                        setNewBookTitle('');
+                                    }
+                                    navigation.navigate('Bookshelf');
+                                }}
+                                onCancel={() => {
+                                    setNewBookTitle('');
+                                    navigation.navigate('Bookshelf');
+                                }}
+                            />
+                        </Layout>
+                    )}
+                </Stack.Screen>
+
+                <Stack.Screen name="EditBook">
+                    {({ route, navigation }) => {
+                        const { bookId, bookTitle } = route.params as { bookId: number; bookTitle: string };
+                        const [editedTitle, setEditedTitle] = useState(bookTitle);
+                        return (
+                            <Layout>
+                                <EditBookPage
+                                    bookTitle={editedTitle}
+                                    setBookTitle={setEditedTitle}
+                                    onSave={() => {
+                                        handleUpdateBook(bookId, editedTitle);
+                                        navigation.goBack();
+                                    }}
+                                    onCancel={() => navigation.goBack()}
+                                />
+                            </Layout>
+                        );
+                    }}
+                </Stack.Screen>
+
+                <Stack.Screen name="BookNotes">
+                    {({ route, navigation }) => {
+                        const { bookId, bookTitle } = route.params as { bookId: number; bookTitle: string };
+                        const bookNotes = notes.filter((note) => note.bookId === bookId);
+                        return (
+                            <Layout>
+                                <BookNotesPage
+                                    bookId={bookId}
+                                    bookTitle={bookTitle}
+                                    notes={bookNotes}
+                                    onNewNote={() =>
+                                        navigation.navigate('NewNote', { bookId, bookTitle })
+                                    }
+                                    onEditNote={(note) => {
+                                        setEditingNote(note);
+                                        setNoteTitle(note.title);
+                                        setNoteContent(note.content);
+                                        setFontSize(note.fontSize);
+                                        setFont(note.font);
+                                        setColor(note.color);
+                                        navigation.navigate('EditNote', { bookId, bookTitle });
+                                    }}
+                                    onDeleteNote={(id) =>
+                                        setNotes(notes.filter((note) => note.id !== id))
+                                    }
+                                    onBack={() => navigation.goBack()}
+                                />
+                            </Layout>
+                        );
+                    }}
+                </Stack.Screen>
+
+                <Stack.Screen name="NewNote">
+                    {({ route, navigation }) => {
+                        const { bookId, bookTitle } = route.params as { bookId: number; bookTitle: string };
+                        return (
+                            <Layout>
+                                <NoteFormPage
+                                    isEditing={false}
+                                    noteTitle={noteTitle}
+                                    setNoteTitle={setNoteTitle}
+                                    noteContent={noteContent}
+                                    setNoteContent={setNoteContent}
+                                    onEditSettings={() =>
+                                        navigation.navigate('NoteSettings', { bookId, bookTitle })
+                                    }
+                                    onSave={() => {
+                                        handleCreateNote(bookId);
+                                        navigation.navigate('BookNotes', { bookId, bookTitle });
+                                    }}
+                                    onCancel={() => {
+                                        setNoteTitle('');
+                                        setNoteContent('');
+                                        navigation.goBack();
+                                    }}
+                                />
+                            </Layout>
+                        );
+                    }}
+                </Stack.Screen>
+
+                <Stack.Screen name="EditNote">
+                    {({ route, navigation }) => {
+                        const { bookId, bookTitle } = route.params as { bookId: number; bookTitle: string };
+                        return (
+                            <Layout>
+                                <NoteFormPage
+                                    isEditing={true}
+                                    noteTitle={noteTitle}
+                                    setNoteTitle={setNoteTitle}
+                                    noteContent={noteContent}
+                                    setNoteContent={setNoteContent}
+                                    onEditSettings={() =>
+                                        navigation.navigate('NoteSettings', { bookId, bookTitle })
+                                    }
+                                    onSave={() => {
+                                        handleUpdateNote();
+                                        navigation.navigate('BookNotes', { bookId, bookTitle });
+                                    }}
+                                    onCancel={() => {
+                                        setNoteTitle('');
+                                        setNoteContent('');
+                                        setEditingNote(null);
+                                        navigation.goBack();
+                                    }}
+                                />
+                            </Layout>
+                        );
+                    }}
+                </Stack.Screen>
+
+                <Stack.Screen name="NoteSettings">
+                    {({ route, navigation }) => {
+                        const { bookId, bookTitle } = route.params as { bookId: number; bookTitle: string };
+                        return (
+                            <Layout>
+                                <NoteSettingsPage
+                                    fontSize={fontSize}
+                                    setFontSize={setFontSize}
+                                    fontFamily={font}
+                                    setFontFamily={setFont}
+                                    color={color}
+                                    setColor={setColor}
+                                    onSave={() => navigation.goBack()}
+                                    onCancel={() => navigation.goBack()}
+                                />
+                            </Layout>
+                        );
+                    }}
+                </Stack.Screen>
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 50,
-  },
-  title: {
-    color: "#00FFCC",
-    fontSize: 24,
-    marginBottom: 10,
-  },
-  subtitle: {
-    color: "#FFF",
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  input: {
-    width: "100%",
-    backgroundColor: "#1C1C1C",
-    borderRadius: 5,
-    padding: 10,
-    color: "#FFF",
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#2C2C2C",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  label: {
-    color: "#00FFCC",
-    fontSize: 16,
-  },
-  bookItem: {
-    backgroundColor: "#2C2C2C",
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  bookText: {
-    color: "#FFF",
-    fontSize: 16,
-  },
-  noteInput: {
-    height: 200,
-    textAlignVertical: "top",
-  },
-  option: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginVertical: 10,
-  },
-  optionText: {
-    color: "#FFF",
-    fontSize: 16,
-  },
-  optionValue: {
-    color: "#00FFCC",
-    fontSize: 16,
-  },
-});
+export default App;
