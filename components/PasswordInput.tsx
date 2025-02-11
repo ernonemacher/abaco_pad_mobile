@@ -1,33 +1,33 @@
-import React from 'react';
-import { View, TextInput, TouchableOpacity } from 'react-native';
-// If available, use a React Native compatible icon library
+import React, { memo } from 'react';
+import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 
-interface PasswordInputProps {
+export interface PasswordInputProps {
     password: string;
-    setPassword: (value: string) => void;
+    onChangePassword: (value: string) => void;
     showPassword: boolean;
-    toggleShowPassword: () => void;
+    onToggleShowPassword: () => void;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
                                                          password,
-                                                         setPassword,
+                                                         onChangePassword,
                                                          showPassword,
-                                                         toggleShowPassword,
+                                                         onToggleShowPassword,
                                                      }) => {
     return (
-        <View className="relative w-full max-w-[306px]">
+        <View style={styles.container}>
             <TextInput
+                style={styles.input}
                 secureTextEntry={!showPassword}
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={onChangePassword}
                 placeholder="********"
-                className="w-full h-[42px] bg-white rounded-[10px] px-4 text-black text-lg"
+                placeholderTextColor="#888"
             />
             <TouchableOpacity
-                onPress={toggleShowPassword}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+                onPress={onToggleShowPassword}
+                style={styles.iconButton}
                 accessibilityRole="button"
             >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -36,4 +36,28 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
     );
 };
 
-export default PasswordInput;
+const styles = StyleSheet.create({
+    container: {
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        marginBottom: 16,
+    },
+    input: {
+        width: '100%',
+        height: 42,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        paddingHorizontal: 16,
+        fontSize: 18,
+        color: '#000',
+    },
+    iconButton: {
+        position: 'absolute',
+        right: 12,
+        top: '50%',
+        transform: [{ translateY: -10 }],
+    },
+});
+
+export default memo(PasswordInput);
