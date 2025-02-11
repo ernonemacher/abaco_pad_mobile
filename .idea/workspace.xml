@@ -5,12 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="396b7c22-7aaa-4cb7-9ebc-be3bff1af8f8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/components/RegisterPage.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/BookNotesPage.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/EditBookPage.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/NoteFormPage.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/NoteSettingsPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/BookFormPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/BookFormPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/PasswordInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/PasswordInput.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/WelcomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WelcomePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/BookShelfPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/BookShelfPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +66,7 @@
       <updated>1738635489136</updated>
       <workItem from="1738635490275" duration="1923000" />
       <workItem from="1738795939985" duration="6048000" />
-      <workItem from="1739311569254" duration="1419000" />
+      <workItem from="1739311569254" duration="2454000" />
     </task>
     <servers />
   </component>
