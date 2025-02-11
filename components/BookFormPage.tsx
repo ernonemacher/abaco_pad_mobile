@@ -38,7 +38,7 @@ const BookFormPage: React.FC<BookFormPageProps> = ({
                     value={bookTitle}
                     onChangeText={setBookTitle}
                     placeholder="Enter book title"
-                    className="w-full h-[42px] bg-white rounded-[10px] px-4 text-black text-lg"
+                    className="w-full h-[42px] bg-white my-6 rounded-[10px] px-4 text-black text-lg"
                     autoFocus
                 />
                 <TextInput
@@ -51,9 +51,9 @@ const BookFormPage: React.FC<BookFormPageProps> = ({
                 />
                 <TouchableOpacity
                     onPress={onSave}
-                    className="w-full bg-[#008A73] py-2 rounded-[10px]"
+                    className="w-full bg-[#008A73] py-2 my-6 rounded-[10px] justify-center items-center"
                 >
-                    <Text className="text-white text-lg">
+                    <Text className="text-white text-lg font-bold">
                         {isEditing ? 'Save Changes' : 'Create Book'}
                     </Text>
                 </TouchableOpacity>
