@@ -1,8 +1,14 @@
 // components/BookNotesPage.tsx
-import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { ArrowLeft, Plus, Edit3, Trash2 } from 'lucide-react-native';
-import { Note } from '@/App';
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { ArrowLeft, Plus, Edit3, Trash2 } from "lucide-react-native";
+import { Note } from "@/App";
 
 interface BookNotesPageProps {
   bookId: number;
@@ -41,7 +47,11 @@ const BookNotesPage: React.FC<BookNotesPageProps> = ({
             <Text
               style={[
                 styles.noteTitle,
-                { fontSize: item.fontSize, fontFamily: item.font, color: item.color },
+                {
+                  fontSize: item.fontSize,
+                  fontFamily: item.font,
+                  color: item.color,
+                },
               ]}
             >
               {item.title}
@@ -66,36 +76,41 @@ const BookNotesPage: React.FC<BookNotesPageProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, width: '100%' },
+  container: { flex: 1, width: "100%" },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
-  title: { color: '#00FFD4', fontSize: 36, fontWeight: '400' },
-  subtitle: { color: '#fff', fontSize: 20, marginBottom: 16, textAlign: 'center' },
+  title: { color: "#00FFD4", fontSize: 36, fontWeight: "400" },
+  subtitle: {
+    color: "#fff",
+    fontSize: 20,
+    marginBottom: 16,
+    textAlign: "center",
+  },
   noteItem: {
-    backgroundColor: '#2F2E2E',
+    backgroundColor: "#2F2E2E",
     borderRadius: 10,
     padding: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
-  noteTitle: { color: '#fff', fontSize: 18 },
-  noteActions: { flexDirection: 'row', gap: 12 },
+  noteTitle: { color: "#fff", fontSize: 18 },
+  noteActions: { flexDirection: "row", gap: 12 },
   newNoteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2F2E2E',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2F2E2E",
     borderRadius: 10,
     padding: 12,
     marginTop: 16,
   },
-  newNoteText: { color: '#fff', fontSize: 18, marginLeft: 8 },
+  newNoteText: { color: "#fff", fontSize: 18, marginLeft: 8 },
 });
 
 export default BookNotesPage;
