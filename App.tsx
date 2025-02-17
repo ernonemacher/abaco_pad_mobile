@@ -164,41 +164,6 @@ function App() {
     }
   };
 
-  const [books, setBooks] = useState<Book[]>([
-    {
-      title: "BOOK 1",
-      isFavorite: false,
-      content: "",
-      fontSize: 0,
-      font: "",
-      color: "",
-      users: [],
-      books: [],
-    },
-    {
-      title: "BOOK 2",
-      isFavorite: false,
-      content: "",
-      fontSize: 0,
-      font: "",
-      color: "",
-      users: [],
-      books: [],
-    },
-    {
-      title: "BOOK 3",
-      isFavorite: false,
-      content: "",
-      fontSize: 0,
-      font: "",
-      color: "",
-      users: [],
-      books: [],
-    },
-  ]);
-  const [newBookTitle, setNewBookTitle] = useState("");
-  const [bookText, setBookText] = useState("");
-
   const [notes, setNotes] = useState<Note[]>([]);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [noteTitle, setNoteTitle] = useState("");
@@ -206,51 +171,6 @@ function App() {
   const [fontSize, setFontSize] = useState(16);
   const [font, setFont] = useState("Arial");
   const [color, setColor] = useState("#000000");
-
-  const handleCreateNote = (bookId: number) => {
-    if (noteTitle.trim()) {
-      const newNote: Note = {
-        id: notes.length + 1,
-        bookId,
-        title: noteTitle.trim(),
-        content: noteContent,
-        fontSize,
-        font,
-        color,
-      };
-      setNotes([...notes, newNote]);
-      setNoteTitle("");
-      setNoteContent("");
-      setFontSize(16);
-      setFont("Arial");
-      setColor("#000000");
-    }
-  };
-
-  const handleUpdateNote = () => {
-    if (editingNote && noteTitle.trim()) {
-      setNotes(
-        notes.map((note) =>
-          note.id === editingNote.id
-            ? {
-                ...note,
-                title: noteTitle.trim(),
-                content: noteContent,
-                fontSize,
-                font,
-                color,
-              }
-            : note
-        )
-      );
-      setEditingNote(null);
-      setNoteTitle("");
-      setNoteContent("");
-      setFontSize(16);
-      setFont("Arial");
-      setColor("#000000");
-    }
-  };
 
   const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <View className="min-h-screen bg-[#232324] flex items-center justify-center p-6">
