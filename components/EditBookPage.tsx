@@ -8,37 +8,52 @@ import {
   StyleSheet,
 } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
+import { Book } from "@/App";
+import { Database } from "firebase/database";
 
-interface EditBookPageProps {
-  bookTitle: string;
-  setBookTitle: (value: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
+interface NewBookPageProps {
+  database: Database;
+  path: string;
+  navigation: any;
+  onLogout: () => void;
 }
 
-const EditBookPage: React.FC<EditBookPageProps> = ({
-  bookTitle,
-  setBookTitle,
-  onSave,
-  onCancel,
+const NewBookPage: React.FC<NewBookPageProps> = ({
+  database,
+  path,
+  navigation,
+  onLogout,
 }) => {
+  const [title, setTitle] = React.useState("");
+
+  function onSelectBook() {
+    console.log(title);
+    navigation.navigate("Bookshelf", {
+      title,
+      database,
+      path,
+      navigation,
+      onLogout,
+    });
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onCancel}>
+        <TouchableOpacity onPress={() => {}}>
           <ArrowLeft size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.title}>Edit Book</Text>
+        <Text style={styles.title}>New Book</Text>
         <View style={{ width: 24 }} />
       </View>
       <TextInput
         style={styles.input}
-        value={bookTitle}
-        onChangeText={setBookTitle}
+        value={title}
+        onChangeText={setTitle}
         placeholder="Enter new book title"
         placeholderTextColor="#888"
       />
-      <TouchableOpacity style={styles.button} onPress={onSave}>
+      <TouchableOpacity style={styles.button} onPress={onSelectBook}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
     </View>
@@ -76,4 +91,4 @@ const styles = StyleSheet.create({
   buttonText: { color: "#fff", fontSize: 18 },
 });
 
-export default EditBookPage;
+export default NewBookPage;

@@ -11,7 +11,7 @@ import RegisterPage from "./components/RegisterPage";
 import AdminSetupPage from "./components/AdminSetupPage";
 import BookshelfPage from "./components/BookShelfPage";
 import BookFormPage from "./components/BookFormPage";
-import EditBookPage from "./components/EditBookPage";
+import NewBookPage from "./components/EditBookPage";
 import BookNotesPage from "./components/BookNotesPage";
 import NoteFormPage from "./components/NoteFormPage";
 import NoteSettingsPage from "./components/NoteSettingsPage";
@@ -26,14 +26,20 @@ import {
   User,
   getReactNativePersistence,
   signOut,
+  getAuth,
 } from "firebase/auth";
-import { Database, get } from "firebase/database";
+import { Database, getDatabase, ref, set } from "firebase/database";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Book {
-  id: number;
   title: string;
+  content: string;
   isFavorite: boolean;
+  fontSize: number;
+  font: string;
+  color: string;
+  users: string[];
+  books: Book[];
 }
 
 export interface Note {
@@ -56,31 +62,45 @@ const firebaseConfig = {
   appId: "1:774777031569:web:9794b57f58527ad767e830",
   measurementId: "G-7HNTC3D498",
 };
+
 function App() {
+  console.log("inside app");
   const Stack = createNativeStackNavigator();
 
   let app: FirebaseApp = getApps()[0];
   let auth: Auth;
+  let database: Database;
   if (!getApps().length) {
     app = initializeApp(firebaseConfig);
     auth = initializeAuth(app, {
       persistence: getReactNativePersistence(AsyncStorage),
     });
+    database = getDatabase(app);
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
         navigationRef.current?.navigate("Bookshelf");
       } else {
-        navigationRef.current?.navigate("Welcome");
+        navigationRef.current?.resetRoot({
+          index: 0,
+          routes: [{ name: "Welcome" }],
+        });
       }
     });
+  } else {
+    auth = getAuth();
+    database = getDatabase(app);
+  }
+
+  if (!auth || !database) {
+    console.log("Firebase not initialized");
   }
 
   const logout = async () => {
     try {
       await signOut(auth);
       setUser(null);
-      navigationRef.current?.reset({
+      navigationRef.current?.resetRoot({
         index: 0,
         routes: [{ name: "Welcome" }],
       });
@@ -102,7 +122,13 @@ function App() {
         password
       );
       setUser(userCredential.user);
-      navigationRef.current?.reset({
+
+      await set(ref(database, "users/" + userCredential.user.uid), {
+        email: userCredential.user.email,
+        id: userCredential.user.uid,
+      });
+
+      navigationRef.current?.resetRoot({
         index: 0,
         routes: [{ name: "Bookshelf" }],
       });
@@ -121,8 +147,15 @@ function App() {
         email,
         password
       );
+
       setUser(userCredential.user);
-      navigationRef.current?.reset({
+
+      await set(ref(database, "users/" + userCredential.user.uid), {
+        email: userCredential.user.email,
+        id: userCredential.user.uid,
+      });
+
+      navigationRef.current?.resetRoot({
         index: 0,
         routes: [{ name: "Bookshelf" }],
       });
@@ -132,9 +165,36 @@ function App() {
   };
 
   const [books, setBooks] = useState<Book[]>([
-    { id: 1, title: "BOOK 1", isFavorite: false },
-    { id: 2, title: "BOOK 2", isFavorite: false },
-    { id: 3, title: "BOOK 3", isFavorite: false },
+    {
+      title: "BOOK 1",
+      isFavorite: false,
+      content: "",
+      fontSize: 0,
+      font: "",
+      color: "",
+      users: [],
+      books: [],
+    },
+    {
+      title: "BOOK 2",
+      isFavorite: false,
+      content: "",
+      fontSize: 0,
+      font: "",
+      color: "",
+      users: [],
+      books: [],
+    },
+    {
+      title: "BOOK 3",
+      isFavorite: false,
+      content: "",
+      fontSize: 0,
+      font: "",
+      color: "",
+      users: [],
+      books: [],
+    },
   ]);
   const [newBookTitle, setNewBookTitle] = useState("");
   const [bookText, setBookText] = useState("");
@@ -192,14 +252,6 @@ function App() {
     }
   };
 
-  const handleUpdateBook = (bookId: number, newTitle: string) => {
-    setBooks(
-      books.map((book) =>
-        book.id === bookId ? { ...book, title: newTitle } : book
-      )
-    );
-  };
-
   const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <View className="min-h-screen bg-[#232324] flex items-center justify-center p-6">
       <View className="w-full max-w-[452px] min-h-[801px] bg-[#232324] border border-black/10 shadow-2xl rounded-[10px] p-6 flex flex-col items-center justify-center">
@@ -247,69 +299,16 @@ function App() {
             <Layout>
               <BookshelfPage
                 title="AbacoPad"
-                books={books}
-                onSelectBook={(book) =>
-                  navigation.navigate("BookNotes", {
-                    bookId: book.id,
-                    bookTitle: book.title,
-                  })
-                }
-                onToggleFavorite={(id) =>
-                  setBooks(
-                    books.map((book) =>
-                      book.id === id
-                        ? { ...book, isFavorite: !book.isFavorite }
-                        : book
-                    )
-                  )
-                }
-                onEditBook={(book) =>
-                  navigation.navigate("EditBook", {
-                    bookId: book.id,
-                    bookTitle: book.title,
-                  })
-                }
-                onDeleteBook={(id) =>
-                  setBooks(books.filter((book) => book.id !== id))
-                }
-                onNewBook={() => navigation.navigate("NewBook")}
+                path=""
                 onLogout={logout}
+                database={database}
+                navigation={navigation}
               />
             </Layout>
           )}
         </Stack.Screen>
 
-        <Stack.Screen name="NewBook">
-          {({ navigation }) => (
-            <Layout>
-              <BookFormPage
-                setBookText={setBookText}
-                bookText={bookText}
-                isEditing={false}
-                bookTitle={newBookTitle}
-                setBookTitle={setNewBookTitle}
-                onSave={() => {
-                  if (newBookTitle.trim()) {
-                    const newBook: Book = {
-                      id: books.length + 1,
-                      title: newBookTitle.trim(),
-                      isFavorite: false,
-                    };
-                    setBooks([...books, newBook]);
-                    setNewBookTitle("");
-                  }
-                  navigation.navigate("Bookshelf");
-                }}
-                onCancel={() => {
-                  setNewBookTitle("");
-                  navigation.navigate("Bookshelf");
-                }}
-              />
-            </Layout>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="EditBook">
+        <Stack.Screen name="NewBookPage">
           {({ route, navigation }) => {
             const { bookId, bookTitle } = route.params as {
               bookId: number;
@@ -318,114 +317,11 @@ function App() {
             const [editedTitle, setEditedTitle] = useState(bookTitle);
             return (
               <Layout>
-                <EditBookPage
-                  bookTitle={editedTitle}
-                  setBookTitle={setEditedTitle}
-                  onSave={() => {
-                    handleUpdateBook(bookId, editedTitle);
-                    navigation.goBack();
-                  }}
-                  onCancel={() => navigation.goBack()}
-                />
-              </Layout>
-            );
-          }}
-        </Stack.Screen>
-
-        <Stack.Screen name="BookNotes">
-          {({ route, navigation }) => {
-            const { bookId, bookTitle } = route.params as {
-              bookId: number;
-              bookTitle: string;
-            };
-            const bookNotes = notes.filter((note) => note.bookId === bookId);
-            return (
-              <Layout>
-                <BookNotesPage
-                  bookId={bookId}
-                  bookTitle={bookTitle}
-                  notes={bookNotes}
-                  onNewNote={() =>
-                    navigation.navigate("NewNote", { bookId, bookTitle })
-                  }
-                  onEditNote={(note) => {
-                    setEditingNote(note);
-                    setNoteTitle(note.title);
-                    setNoteContent(note.content);
-                    setFontSize(note.fontSize);
-                    setFont(note.font);
-                    setColor(note.color);
-                    navigation.navigate("EditNote", { bookId, bookTitle });
-                  }}
-                  onDeleteNote={(id) =>
-                    setNotes(notes.filter((note) => note.id !== id))
-                  }
-                  onBack={() => navigation.goBack()}
-                />
-              </Layout>
-            );
-          }}
-        </Stack.Screen>
-
-        <Stack.Screen name="NewNote">
-          {({ route, navigation }) => {
-            const { bookId, bookTitle } = route.params as {
-              bookId: number;
-              bookTitle: string;
-            };
-            return (
-              <Layout>
-                <NoteFormPage
-                  isEditing={false}
-                  noteTitle={noteTitle}
-                  setNoteTitle={setNoteTitle}
-                  noteContent={noteContent}
-                  setNoteContent={setNoteContent}
-                  onEditSettings={() =>
-                    navigation.navigate("NoteSettings", { bookId, bookTitle })
-                  }
-                  onSave={() => {
-                    handleCreateNote(bookId);
-                    navigation.navigate("BookNotes", { bookId, bookTitle });
-                  }}
-                  onCancel={() => {
-                    setNoteTitle("");
-                    setNoteContent("");
-                    navigation.goBack();
-                  }}
-                />
-              </Layout>
-            );
-          }}
-        </Stack.Screen>
-
-        <Stack.Screen name="EditNote">
-          {({ route, navigation }) => {
-            const { bookId, bookTitle } = route.params as {
-              bookId: number;
-              bookTitle: string;
-            };
-            return (
-              <Layout>
-                <NoteFormPage
-                  isEditing={true}
-                  noteTitle={noteTitle}
-                  setNoteTitle={setNoteTitle}
-                  noteContent={noteContent}
-                  setNoteContent={setNoteContent}
-                  onEditSettings={() =>
-                    navigation.navigate("NoteSettings", { bookId, bookTitle })
-                  }
-                  onSave={() => {
-                    handleUpdateNote();
-                    navigation.navigate("BookNotes", { bookId, bookTitle });
-                  }}
-                  onCancel={() => {
-                    setNoteTitle("");
-                    setNoteContent("");
-                    setEditingNote(null);
-                    navigation.goBack();
-                  }}
+                <NewBookPage
+                  database={database}
+                  path=""
+                  navigation={navigation}
+                  onLogout={logout}
                 />
               </Layout>
             );
