@@ -12,39 +12,27 @@ import {
 import PasswordInput from "./PasswordInput";
 
 export interface WelcomePageProps {
-  email: string;
-  onChangeEmail: (value: string) => void;
-  password: string;
-  onChangePassword: (value: string) => void;
-  showPassword: boolean;
-  onToggleShowPassword: () => void;
-  onStart: () => void;
+  navigation: any;
+  onStart: (email: string, password: string) => void;
   onRegister: () => void;
 }
 
-const WelcomePage: React.FC<WelcomePageProps> = ({
-  email,
-  onChangeEmail,
-  password,
-  onChangePassword,
-  showPassword,
-  onToggleShowPassword,
-  onStart,
-  onRegister,
-}) => {
-  const handleEmailChange = useCallback(
-    (value: string) => {
-      onChangeEmail(value);
-    },
-    [onChangeEmail]
-  );
+const WelcomePage: React.FC<WelcomePageProps> = ({ onStart, onRegister }) => {
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  const handlePasswordChange = useCallback(
-    (value: string) => {
-      onChangePassword(value);
-    },
-    [onChangePassword]
-  );
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+  };
+
+  const onToggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -74,7 +62,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
           showPassword={showPassword}
           onToggleShowPassword={onToggleShowPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={onStart}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => onStart(email, password)}
+        >
           <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
 

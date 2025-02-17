@@ -1,38 +1,51 @@
 // components/BookshelfPage.tsx
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { ArrowLeft, Plus, Heart, Edit3, Trash2 } from "lucide-react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+} from "react-native";
+import { Plus, Heart, Edit3, Trash2, LogOutIcon } from "lucide-react-native";
 import { Book } from "../App";
 
 interface BookshelfPageProps {
+  title: string;
   books: Book[];
-  onSelectBook: (book: Book) => void; // New: tapping a book
+  onSelectBook: (book: Book) => void;
   onToggleFavorite: (id: number) => void;
   onEditBook: (book: Book) => void;
   onDeleteBook: (id: number) => void;
   onNewBook: () => void;
-  onBack: () => void;
+  onLogout: () => void;
 }
 
 const BookshelfPage: React.FC<BookshelfPageProps> = ({
+  title,
   books,
   onSelectBook,
   onToggleFavorite,
   onEditBook,
   onDeleteBook,
   onNewBook,
-  onBack,
+  onLogout,
 }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack}>
-          <ArrowLeft size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.title}>AbacoPad</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 1 }} />
+        <Text style={styles.title}>title</Text>
+        <View style={{ width: 1 }} />
       </View>
-      <Text style={styles.subtitle}>Your Books</Text>
+      <TextInput
+        value={""}
+        onChangeText={() => {}}
+        placeholder="Enter book notes here..."
+        className="w-full h-[180px] bg-white rounded-[10px] px-4 text-black text-lg"
+        multiline
+      />
+      <View style={{ height: 12 }} />
       {books.map((book) => (
         <TouchableOpacity
           key={book.id}
@@ -60,6 +73,10 @@ const BookshelfPage: React.FC<BookshelfPageProps> = ({
       <TouchableOpacity style={styles.newBookButton} onPress={onNewBook}>
         <Plus size={24} color="#79747E" />
         <Text style={styles.newBookText}>NEW BOOK</Text>
+      </TouchableOpacity>
+      <View style={{ height: 12 }} />
+      <TouchableOpacity onPress={onLogout}>
+        <LogOutIcon size={24} color="#fff" />
       </TouchableOpacity>
     </View>
   );

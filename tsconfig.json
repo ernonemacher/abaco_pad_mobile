@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,9 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
     }
   },
   "include": [
@@ -35,8 +30,6 @@
     ".next/types/**/*.ts",
     "nativewind-env.d.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": ["node_modules"],
   "extends": "expo/tsconfig.base"
 }

@@ -1,6 +1,5 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useState } from "react";
 import {
-  View,
   Text,
   TouchableOpacity,
   TextInput,
@@ -12,37 +11,30 @@ import {
 import PasswordInput from "./PasswordInput";
 
 export interface WelcomePageProps {
-  email: string;
-  onChangeEmail: (value: string) => void;
-  password: string;
-  onChangePassword: (value: string) => void;
-  showPassword: boolean;
-  onToggleShowPassword: () => void;
-  onCreate: () => void;
+  navigation: any;
+  onCreate: (email: string, password: string) => void;
 }
 
-const RegisterPage: React.FC<WelcomePageProps> = ({
-  email,
-  onChangeEmail,
-  password,
-  onChangePassword,
-  showPassword,
-  onToggleShowPassword,
-  onCreate,
-}) => {
-  const handleEmailChange = useCallback(
-    (value: string) => {
-      onChangeEmail(value);
-    },
-    [onChangeEmail]
-  );
+const RegisterPage: React.FC<WelcomePageProps> = ({ navigation, onCreate }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handlePasswordChange = useCallback(
-    (value: string) => {
-      onChangePassword(value);
-    },
-    [onChangePassword]
-  );
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+  };
+
+  const onChangePassword = (value: string) => {
+    setPassword(value);
+  };
+
+  const onToggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handlePasswordChange = (value: string) => {
+    onChangePassword(value);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -72,7 +64,10 @@ const RegisterPage: React.FC<WelcomePageProps> = ({
           showPassword={showPassword}
           onToggleShowPassword={onToggleShowPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={onCreate}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => onCreate(email, password)}
+        >
           <Text style={styles.buttonText}>Criar</Text>
         </TouchableOpacity>
       </ScrollView>
